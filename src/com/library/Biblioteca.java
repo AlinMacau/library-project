@@ -12,16 +12,19 @@ public class Biblioteca {
     ArrayList<Carte> carti = new ArrayList<>();
 
 
-    public void adaugaStudent(String nume, String facultate, int anDeStudiu) throws NumeDejaExistentException {
+    public void adaugaStudent(String nume, String facultate, int anDeStudiu) {
         int counter = 0;
         Student s = new Student(clienti.size() + 1, nume, 0, null, facultate, anDeStudiu);
-        for (Client client : clienti) {
-            if (s.getNume().equals(client.getNume())) {
-                counter++;
-//                System.out.println("Nume " + client.getNume() + " deja existent!");
-                throw new NumeDejaExistentException("Nume " + client.getNume() + " deja existent!");
-            }
+        try {
+            for (Client client : clienti) {
+                if (s.getNume().equals(client.getNume())) {
+                    counter++;
+                    throw new NumeDejaExistentException("Nume " + client.getNume() + " deja existent!");
+                }
 
+            }
+        } catch (NumeDejaExistentException e) {
+            e.printStackTrace();
         }
         if (counter == 0) {
             clienti.add(s);
@@ -30,15 +33,18 @@ public class Biblioteca {
 
     }
 
-    public void adaugaProfesor(String nume, String materie) throws NumeDejaExistentException {
+    public void adaugaProfesor(String nume, String materie) {
         Profesor p = new Profesor(clienti.size() + 1, nume, 0, null, materie);
         int counter = 0;
-        for (Client client : clienti) {
-            if (client.getNume().equals(p.getNume())) {
-                counter++;
-//                System.out.println("Nume " + client.getNume() + " deja existent!");
-                throw new NumeDejaExistentException("Nume " + client.getNume() + " deja existent!");
+        try {
+            for (Client client : clienti) {
+                if (p.getNume().equals(client.getNume())) {
+                    counter++;
+                    throw new NumeDejaExistentException("Nume " + client.getNume() + " deja existent!");
+                }
             }
+        } catch (NumeDejaExistentException e) {
+            e.printStackTrace();
         }
         if (counter == 0) {
             clienti.add(p);
@@ -62,7 +68,7 @@ public class Biblioteca {
     public void adaugaCarte(String titlu, String autor, Gen gen, int numarPagini) {
         Carte c = new Carte(carti.size() + 1, titlu, autor, gen, numarPagini, false);
         carti.add(c);
-        System.out.println("Cartea " + titlu + " a fost adaugata in biblioteca.");
+        System.out.println("Cartea " + c.getTitlu() + " a fost adaugata!");
     }
 
     public void afiseazaCarti() {
@@ -121,38 +127,50 @@ public class Biblioteca {
     }
 
     public void imprumutaCarte(long cod) {
-        try {
-            int counter = 0;
-            for (Carte carte : carti) {
-                if (carte.getCod() == cod && carte.getEsteImprumutata() == false) {
-                    System.out.println("Introduceti numele clientului care imprumuta cartea");
-                    Scanner sc = new Scanner(System.in);
-                    String nume = sc.nextLine();
-                    for (Client client : clienti) {
-                        if (client.getNume().equals(nume)) {
-                            carte.setEsteImprumutata(true);//modificarea statusului cartii in "imprumutata"
-                            System.out.println("Cartea " + carte.getTitlu() + " este imprumutata de " + client.getNume());
+        int counterCarte = 0;
+        int counterClienti = 0;
+        for (Carte carte : carti) {
+            if (carte.getCod() == cod && carte.getEsteImprumutata() == false) {
+                System.out.println("Introduceti numele clientului care imprumuta cartea");
+                Scanner sc = new Scanner(System.in);
+                String nume = sc.nextLine();
+                for (Client client : clienti) {
+                    if (client.getNume().equals(nume)) {
+                        carte.setEsteImprumutata(true);//modificarea statusului cartii in "imprumutata"
+                        System.out.println("Cartea " + carte.getTitlu() + " este imprumutata de " + client.getNume());
 
-                            client.adaugaNrTotalCarti();//se adauga la nr de carti citite de un client
-                            System.out.println(client.getNume() + " are imprumutate "
-                                    + client.getNrTotalCarti() + " carti.");
+                        client.adaugaNrTotalCarti();//se adauga la nr de carti citite de un client
+                        System.out.println(client.getNume() + " are imprumutate "
+                                + client.getNrTotalCarti() + " carti.");
 
-                            client.setDataRetur();//se seteaza data de retur pentru acest client peste 30 de zile
-                            System.out.println("Data de retur : " + client.getDataRetur());
-                            counter++;
-                        }
+                        client.setDataRetur();//se seteaza data de retur pentru acest client peste 30 de zile
+                        System.out.println("Data de retur : " + client.getDataRetur());
+                        counterCarte++;
+                        counterClienti++;
                     }
                 }
+                try {
+                    if (counterClienti == 0) {
+                        throw new Exception("Acest client nu exista!");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-            if (counter == 0) {
-//            System.out.println("Cartea este indisponibila");
-                throw new CarteIndisponibilaException("Cartea este indisponibila");
+        }
+        if (counterCarte != 0 && counterClienti != 0) {
+            try {
+                if (counterCarte == 0) {
+                    throw new CarteIndisponibilaException("Cartea este indisponibila");
+                }
+            } catch (CarteIndisponibilaException ex) {
+                ex.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (CarteIndisponibilaException ex) {
-            ex.printStackTrace();
+
         }
     }
-
 
     public void returneazaCarte(long cod) {
         for (Carte carte : carti) {
@@ -183,11 +201,14 @@ public class Biblioteca {
 
     public void arePenalitati(int id) {
         for (int i = 0; i < clienti.size(); i++) {
-            if (clienti.get(i).getId() == id) {
+            if (clienti.get(i).getId() == id && clienti.get(i).getDataRetur() == null) {
+                System.out.println("Clientul " + clienti.get(i).getNume() + " nu are imprumutata o carte momentan.");
+            }
+            else if (clienti.get(i).getId() == id) {
                 if (Calendar.getInstance().getTime().before(clienti.get(i).getDataRetur())) {
-                    System.out.println("Nu are penalitati");
+                    System.out.println(clienti.get(i).getNume() + " nu are penalitati");
                 } else {
-                    System.out.println("Are penalitati");
+                    System.out.println(clienti.get(i).getNume() + " are penalitati");
                 }
             }
         }

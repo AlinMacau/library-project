@@ -3,13 +3,17 @@ package com.library;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) throws NumeDejaExistentException {
+    public static void main(String[] args) {
 
-        Biblioteca biblioteca =     new Biblioteca();
+        Biblioteca biblioteca = new Biblioteca();
+
         biblioteca.adaugaStudent("Alin Macau", "UNITBV", 3);
+//        biblioteca.adaugaStudent("Alin Macau", "UNITBV", 3);
+        biblioteca.adaugaProfesor("Prof Ionescu", "SM");
         biblioteca.adaugaProfesor("Prof Ionescu", "SM");
         biblioteca.adaugaProfesor("Gigel Popa", "SM");
-//        biblioteca.afiseazaClienti();
+
+        biblioteca.afiseazaClienti();
 //        biblioteca.afiseazaStudenti();
 
         biblioteca.adaugaCarte("Capra cu 3 iezi", "ion Creanga", Gen.NUVELA, 100);
@@ -22,11 +26,12 @@ public class Main {
 //        biblioteca.sorteazaCarti();
 //        biblioteca.sorteazaClienti();
 //        biblioteca.celMaiFidelCititor();
-//        biblioteca.imprumutaCarte(1);
+        biblioteca.imprumutaCarte(2);
 //        biblioteca.returneazaCarte(1);
 //        biblioteca.stergeCarte("Luceafarul");
 //        biblioteca.stergeClient("Alin Macau");
-//        biblioteca.arePenalitati(1);
+        biblioteca.arePenalitati(1);
+        biblioteca.arePenalitati(2);
 //        biblioteca.exit();
 
 
