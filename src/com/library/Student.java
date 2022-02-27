@@ -11,6 +11,4 @@ public class Student extends Client{
         this.facultate = facultate;
         this.anDeStudiu = anDeStudiu;
     }
-
-
 }

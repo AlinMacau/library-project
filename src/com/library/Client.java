@@ -2,8 +2,9 @@ package com.library;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
 
-public class Client {
+abstract class Client {
     private int id;
     private String nume;
     private int nrTotalCarti;
@@ -45,6 +46,7 @@ public class Client {
         calendar.add(Calendar.DAY_OF_YEAR, 30);
         this.dataRetur = calendar.getTime();
     }
-
-
+    public void resetDataRetur(){
+        this.dataRetur = null;
+    }
 }
